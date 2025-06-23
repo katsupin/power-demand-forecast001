@@ -68,15 +68,9 @@ def load_models_fast():
     with st.spinner("🤖 モデル学習中..."):
         demo_data = load_demo_data_fast()
         predictor = PowerDemandPredictor()
-        results = {}
         
-        # 各モデルを学習
-        for model_name in ['LinearRegression', 'Prophet', 'RandomForest']:
-            results[model_name] = predictor.train_and_predict(
-                demo_data['historical_data'], 
-                demo_data['weather_forecast_24h'], 
-                model_name
-            )
+        # 全モデルを学習
+        results = predictor.train_all_models(demo_data['historical_data'])
         
         return predictor, results
 
@@ -84,20 +78,8 @@ def load_models_fast():
 
 # メイン関数
 def main():
-    # 認証チェック
-    auth_manager = AuthManager()
-    
-    if not auth_manager.is_authenticated():
-        auth_manager.login_form()
-        return
-    
-    # ヘッダー（認証後）
-    col_header, col_logout = st.columns([4, 1])
-    with col_header:
-        st.markdown('<h1 class="main-header">⚡ 電力需給予測システム - AI実証デモ</h1>', unsafe_allow_html=True)
-    with col_logout:
-        if st.button("🚪 ログアウト", help="認証を解除してログアウト"):
-            auth_manager.logout()
+    # ヘッダー
+    st.markdown('<h1 class="main-header">⚡ 電力需給予測システム - AI実証デモ</h1>', unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -117,29 +99,50 @@ def main():
     st.sidebar.markdown("---")  # 区切り線
     st.sidebar.header("🗂️ データ管理")
     
-    # データ管理ボタン
-    st.sidebar.caption("💡 データとモデルの管理")
+    # データ管理ボタン（2列配置）
+    st.sidebar.caption("💡 再構築：新しい学習データ生成+AIモデル再学習")
     col_btn1, col_btn2 = st.sidebar.columns(2)
     
     with col_btn1:
-        if st.button("🔄 再生成", help="データとモデルを再生成"):
-            st.cache_data.clear()
-            st.cache_resource.clear()
-            st.sidebar.success("✅ 再生成完了！")
-            st.rerun()
+        if st.sidebar.button("🔄 学習データ・モデル再構築", help="学習データを新規生成し、全AIモデルを再学習します（数分かかります）"):
+            with st.spinner("📊 学習データ再生成中... 🤖 AIモデル再学習中..."):
+                st.cache_data.clear()
+                st.cache_resource.clear()
+                st.sidebar.success("✅ 学習データ・モデル再構築完了！")
+                st.rerun()
     
     with col_btn2:
-        if st.button("🗑️ クリア", help="キャッシュをクリア"):
+        if st.sidebar.button("🗑️ クリア", help="全てのキャッシュファイルを削除"):
             st.cache_data.clear()
             st.cache_resource.clear()
             st.sidebar.success("✅ クリア完了！")
             st.rerun()
     
-    # データ状況表示
+    # CSVエクスポート機能
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("📥 データエクスポート")
+    
     if demo_data is not None:
         hist_data = demo_data['historical_data']
-        st.sidebar.success("✅ データ準備完了")
+        st.sidebar.success("✅ エクスポート可能")
         st.sidebar.caption(f"データ: {len(hist_data):,}行 | モデル: 3個")
+        
+        # エクスポートボタン
+        if st.sidebar.button("💾 CSVダウンロード", help="履歴データをCSV形式でダウンロード"):
+            # CSVデータを生成
+            csv = hist_data.to_csv(index=False)
+            
+            # ダウンロードボタン
+            st.sidebar.download_button(
+                label="📊 historical_data.csv",
+                data=csv,
+                file_name=f"power_demand_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                mime="text/csv",
+                help="クリックしてCSVファイルをダウンロード"
+            )
+    else:
+        st.sidebar.warning("⚠️ データなし")
+        st.sidebar.caption("先にデータ生成が必要です")
     
     # 各モードの実行
     if demo_mode == "📊 予測精度の実証":

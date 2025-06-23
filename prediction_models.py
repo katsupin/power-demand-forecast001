@@ -163,6 +163,15 @@ class PowerDemandPredictor:
         """Random Forest モデルの学習"""
         print("📊 Random Forest モデルを学習中...")
         
+        # データのコピーを作成
+        data = data.copy()
+        
+        # sin/cos特徴量を生成（予測時と同じ方法）
+        data['hour_sin'] = np.sin(2 * np.pi * data['hour'] / 24)
+        data['hour_cos'] = np.cos(2 * np.pi * data['hour'] / 24)
+        data['day_of_year_sin'] = np.sin(2 * np.pi * data['day_of_year'] / 365)
+        data['day_of_year_cos'] = np.cos(2 * np.pi * data['day_of_year'] / 365)
+        
         # 特徴量準備（より多くの特徴量を使用）
         features = [
             'temperature', 'hour', 'weekday', 'month', 'is_holiday',
@@ -253,11 +262,14 @@ class PowerDemandPredictor:
             features = ['temperature', 'hour', 'weekday', 'month', 'is_holiday']
             scaler = self.scalers[model_name]
         else:  # RandomForest
-            # sin/cos特徴量を生成
+            # day_of_year を生成（学習時と同じ方法）
+            future_data['day_of_year'] = future_data['datetime'].dt.dayofyear
+            
+            # sin/cos特徴量を生成（学習時と同じ方法）
             future_data['hour_sin'] = np.sin(2 * np.pi * future_data['hour'] / 24)
             future_data['hour_cos'] = np.cos(2 * np.pi * future_data['hour'] / 24)
-            future_data['day_of_year_sin'] = np.sin(2 * np.pi * future_data['datetime'].dt.dayofyear / 365)
-            future_data['day_of_year_cos'] = np.cos(2 * np.pi * future_data['datetime'].dt.dayofyear / 365)
+            future_data['day_of_year_sin'] = np.sin(2 * np.pi * future_data['day_of_year'] / 365)
+            future_data['day_of_year_cos'] = np.cos(2 * np.pi * future_data['day_of_year'] / 365)
             
             features = [
                 'temperature', 'hour', 'weekday', 'month', 'is_holiday',
