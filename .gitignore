@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+power_forecast_env/
+venv/
+env/
+ENV/
+
+# Streamlit
+.streamlit/
+streamlit.log
+*.log
+
+# Data files
+*.csv
+*.pkl
+cache/
+backup*/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Screenshots
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Temporary files
+temp/
+tmp/
+*.bak
+*.backup
