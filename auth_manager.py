@@ -55,14 +55,6 @@ class AuthManager:
         # シンプルなページスタイル
         st.markdown("""
         <style>
-        .login-container {
-            max-width: 400px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
         .login-header {
             text-align: center;
             color: #1f77b4;
@@ -70,9 +62,6 @@ class AuthManager:
         }
         </style>
         """, unsafe_allow_html=True)
-        
-        # ログインコンテナ
-        st.markdown('<div class="login-container">', unsafe_allow_html=True)
         
         # ヘッダー
         st.markdown('<h2 class="login-header">⚡ 電力需給予測システム</h2>', unsafe_allow_html=True)
@@ -114,8 +103,6 @@ class AuthManager:
         🤖 Powered by Streamlit & Claude Code
         </div>
         """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
         
         return False
     
