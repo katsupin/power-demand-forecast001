@@ -19,6 +19,7 @@ warnings.filterwarnings('ignore')
 try:
     from data_preparation import create_demo_dataset, PowerDemandDataGenerator
     from prediction_models import PowerDemandPredictor, create_ensemble_prediction
+    from auth_manager import AuthManager
 except ImportError:
     st.error("❌ 必要なモジュールが見つかりません。data_preparation.py と prediction_models.py が同じディレクトリにあることを確認してください。")
     st.stop()
@@ -78,8 +79,20 @@ def load_models_fast():
 
 # メイン関数
 def main():
-    # ヘッダー
-    st.markdown('<h1 class="main-header">⚡ 電力需給予測システム - AI実証デモ</h1>', unsafe_allow_html=True)
+    # 認証チェック
+    auth_manager = AuthManager()
+    
+    if not auth_manager.is_authenticated():
+        auth_manager.login_form()
+        return
+    
+    # ヘッダー（認証後）
+    col_header, col_logout = st.columns([4, 1])
+    with col_header:
+        st.markdown('<h1 class="main-header">⚡ 電力需給予測システム - AI実証デモ</h1>', unsafe_allow_html=True)
+    with col_logout:
+        if st.button("🚪 ログアウト", help="認証を解除してログアウト"):
+            auth_manager.logout()
     
     st.markdown("---")
     
